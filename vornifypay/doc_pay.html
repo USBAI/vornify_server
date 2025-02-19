@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VornifyPay API Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        .endpoint {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Consolas', monospace;
+        }
+        .method {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .url {
+            color: #4CAF50;
+        }
+        h2 {
+            color: #2196F3;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .note {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>VornifyPay API Documentation</h1>
+    
+    <div class="note">
+        <strong>Base URL:</strong> http://localhost:3010/api/vornifypay
+    </div>
+
+    <h2>1. One-Time Payment</h2>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="url">/api/vornifypay</span></p>
+        <p>Create a one-time payment for products or services.</p>
+        
+        <h4>Request Format:</h4>
+        <pre><code>{
+    "command": "payment",
+    "data": {
+        "amount": 149.99,
+        "currency": "usd",
+        "payment_type": "onetime",
+        "product_data": {
+            "name": "Product Name",
+            "product_id": "PROD_123",
+            "description": "Product Description",
+            "customer_name": "John Doe",
+            "email": "customer@example.com",
+            "phone": "+1234567890",
+            // Additional product details as needed
+        }
+    }
+}</code></pre>
+
+        <h4>Response Format:</h4>
+        <pre><code>{
+    "status": true,
+    "payment_intent_id": "pi_xxxxxxxxxxxxx",
+    "client_secret": "pi_xxxxxxxxxxxxx_secret_xxxxxxxxxxxxx",
+    "public_key": "pk_xxxxxxxxxxxxxxxxxxxxxxxx",
+    "amount": 149.99,
+    "currency": "usd",
+    "payment_type": "onetime",
+    "product_details": {
+        // Product data echoed back
+    }
+}</code></pre>
+    </div>
+
+    <h2>2. Subscription Payment</h2>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="url">/api/vornifypay</span></p>
+        <p>Create a subscription for recurring payments.</p>
+
+        <h4>Request Format:</h4>
+        <pre><code>{
+    "command": "subscription",
+    "data": {
+        "customer_email": "customer@example.com",
+        "price_id": "price_xxxxxxxxxxxxx",
+        "trial_days": 7,
+        "product_data": {
+            "plan_name": "Premium Plan",
+            "features": "All Access",
+            "billing_cycle": "monthly",
+            "customer_name": "John Doe",
+            "description": "Premium Subscription",
+            "product_id": "PREMIUM_001",
+            "amount": "19.99",
+            "currency": "usd"
+        }
+    }
+}</code></pre>
+
+        <h4>Response Format:</h4>
+        <pre><code>{
+    "status": true,
+    "subscription_id": "sub_xxxxxxxxxxxxx",
+    "client_secret": "pi_xxxxxxxxxxxxx_secret_xxxxxxxxxxxxx",
+    "public_key": "pk_xxxxxxxxxxxxxxxxxxxxxxxx",
+    "customer_id": "cus_xxxxxxxxxxxxx",
+    "trial_end": 1234567890,
+    "current_period_end": 1234567890,
+    "product_details": {
+        // Product data echoed back
+    }
+}</code></pre>
+    </div>
+
+    <h2>3. Verify Payment</h2>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="url">/api/vornifypay</span></p>
+        <p>Verify the status of a payment.</p>
+
+        <h4>Request Format:</h4>
+        <pre><code>{
+    "command": "verify",
+    "data": {
+        "payment_intent_id": "pi_xxxxxxxxxxxxx"
+    }
+}</code></pre>
+
+        <h4>Response Format:</h4>
+        <pre><code>{
+    "status": true,
+    "payment_status": "succeeded",
+    "amount": 149.99,
+    "currency": "usd",
+    "metadata": {
+        // Payment metadata
+    }
+}</code></pre>
+    </div>
+
+    <h2>Client-Side Integration</h2>
+    <div class="endpoint">
+        <h4>1. Initialize Stripe:</h4>
+        <pre><code>const stripe = Stripe('YOUR_PUBLIC_KEY');
+const elements = stripe.elements();</code></pre>
+
+        <h4>2. Create Payment Form:</h4>
+        <pre><code>// Create card element
+const card = elements.create('card');
+card.mount('#card-element');
+
+// Handle form submission
+async function handlePayment(clientSecret) {
+    const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+            card: card,
+            billing_details: {
+                name: 'Customer Name',
+                email: 'customer@example.com'
+            }
+        }
+    });
+
+    if (result.error) {
+        // Handle error
+        console.error(result.error);
+    } else {
+        // Payment successful
+        console.log(result.paymentIntent);
+    }
+}</code></pre>
+
+        <h4>3. Handle Subscription:</h4>
+        <pre><code>async function handleSubscription(clientSecret) {
+    const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+            card: card,
+            billing_details: {
+                name: 'Customer Name',
+                email: 'customer@example.com'
+            }
+        },
+        setup_future_usage: 'off_session'
+    });
+
+    if (result.error) {
+        // Handle error
+        console.error(result.error);
+    } else {
+        // Subscription successful
+        console.log(result.paymentIntent);
+    }
+}</code></pre>
+    </div>
+
+    <div class="note">
+        <h4>Important Notes:</h4>
+        <ul>
+            <li>All amounts should be in decimal format (e.g., 149.99)</li>
+            <li>Currency should be in lowercase ISO format (e.g., 'usd', 'eur')</li>
+            <li>Store the payment_intent_id for future reference</li>
+            <li>Always verify payment status before fulfilling orders</li>
+            <li>Handle errors appropriately on both client and server side</li>
+        </ul>
+    </div>
+</body>
+</html> 

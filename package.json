@@ -1,0 +1,34 @@
+{
+  "name": "vornifydb",
+  "version": "1.0.0",
+  "description": "Vornify Payment and Database API",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "vercel-build": "echo 'Building...'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "payment",
+    "api",
+    "stripe",
+    "mongodb"
+  ],
+  "author": "Vornify",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "decimal.js": "^10.5.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongodb": "^6.3.0",
+    "stripe": "^14.17.0",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

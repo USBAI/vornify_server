@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VornifyDB Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .endpoint {
+            background-color: #e7f2ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .example {
+            background-color: #f0fff0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>VornifyDB Documentation</h1>
+    
+    <h2>Introduction</h2>
+    <p>VornifyDB is a MongoDB wrapper that provides a simplified interface for database operations. It uses a single endpoint
+    for all database operations with a command-based structure.</p>
+
+    <h2>Base Configuration</h2>
+    <pre><code>
+const BASE_URL = 'http://localhost:3010/api/vornifydb';
+    </code></pre>
+
+    <h2>Request Format</h2>
+    <pre><code>
+{
+    "database_name": "your_database",  // Optional, defaults to "VornifyDB"
+    "collection_name": "your_collection",  // Required
+    "command": "--operation",  // Required: --create, --read, --update, --delete, --verify
+    "data": {}  // Operation-specific data
+}
+    </code></pre>
+
+    <h2>Commands and Examples</h2>
+
+    <div class="endpoint">
+        <h3>Create Record (--create)</h3>
+        <p>Creates a new record in the specified collection.</p>
+        
+        <div class="example">
+            <h4>Example 1: Create a User</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "users",
+        command: "--create",
+        data: {
+            id: "user_" + Date.now(),
+            name: "John Doe",
+            email: "john@example.com",
+            role: "user",
+            created_at: new Date().toISOString(),
+            isPrivate: true
+        }
+    })
+});
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Example 2: Create a Project</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "projects",
+        command: "--create",
+        data: {
+            id: "proj_" + Date.now(),
+            name: "New Website",
+            description: "Company website redesign",
+            status: "active",
+            created_at: new Date().toISOString(),
+            isPrivate: false
+        }
+    })
+});
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Read Records (--read)</h3>
+        <p>Retrieves records from the specified collection.</p>
+
+        <div class="example">
+            <h4>Example 1: Get All Records</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "projects",
+        command: "--read",
+        data: {}  // Empty data returns all records
+    })
+});
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Example 2: Get Records with Filter</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "projects",
+        command: "--read",
+        data: {
+            status: "active",
+            isPrivate: false
+        }
+    })
+});
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Read All Records (--read)</h3>
+        <p>Retrieves all records from a specified collection. Simply provide an empty data object to get all records.</p>
+
+        <div class="example">
+            <h4>Example 1: Get All Projects</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "projects",
+        command: "--read",
+        data: {}  // Empty data object returns all records
+    })
+});
+
+// Example Response:
+{
+    "status": true,
+    "data": [
+        {
+            "_id": "67ac888ae68d9e0b0d44a2a9",
+            "id": "1739360390724",
+            "name": "Project 1",
+            "description": "Project description...",
+            "created_at": "2024-02-12T11:39:50.724Z",
+            "isPrivate": false
+        },
+        {
+            "_id": "67acac83e68d9e0b0d44a34c",
+            "id": "1739369598943",
+            "name": "Project 2",
+            "description": "Another project...",
+            "created_at": "2024-02-12T14:13:18.943Z",
+            "isPrivate": false
+        }
+        // ... more records
+    ]
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Example 2: Get All Users</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "users",
+        command: "--read",
+        data: {}
+    })
+});
+
+// Example Response:
+{
+    "status": true,
+    "data": [
+        {
+            "_id": "67ac888ae68d9e0b0d44a2b1",
+            "id": "user_1739360390724",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "created_at": "2024-02-12T11:39:50.724Z",
+            "isPrivate": true
+        },
+        {
+            "_id": "67acac83e68d9e0b0d44a35d",
+            "id": "user_1739369598943",
+            "name": "Jane Smith",
+            "email": "jane@example.com",
+            "created_at": "2024-02-12T14:13:18.943Z",
+            "isPrivate": true
+        }
+        // ... more records
+    ]
+}
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Example 3: Python Implementation</h4>
+            <pre><code>
+import requests
+import json
+
+def read_all_records(collection_name):
+    url = "http://localhost:3010/api/vornifydb"
+    
+    payload = {
+        "database_name": "VornifyDB",
+        "collection_name": collection_name,
+        "command": "--read",
+        "data": {}
+    }
+    
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        
+        print("\nRead All Records Response:")
+        print(json.dumps(response.json(), indent=2))
+        return response.json()
+        
+    except requests.exceptions.RequestException as e:
+        print(f"\nError reading records: {str(e)}")
+        return {"status": False, "error": str(e)}
+
+# Example usage:
+result = read_all_records("projects")
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Important Notes</h4>
+            <ul>
+                <li>This operation returns all records in the collection, so use it carefully with large collections</li>
+                <li>Results are automatically paginated if the collection is very large</li>
+                <li>Private records (isPrivate: true) will still be returned if they exist in the collection</li>
+                <li>The response includes the MongoDB _id field as well as any custom id field</li>
+                <li>Consider using filters if you only need a subset of the records</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Update Record (--update)</h3>
+        <p>Updates existing records in the specified collection.</p>
+
+        <div class="example">
+            <h4>Example 1: Update User Profile</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "users",
+        command: "--update",
+        data: {
+            filter: { email: "john@example.com" },
+            update: {
+                name: "John Smith",
+                updated_at: new Date().toISOString()
+            }
+        }
+    })
+});
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Example 2: Update Project Status</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "projects",
+        command: "--update",
+        data: {
+            filter: { id: "proj_1234567890" },
+            update: {
+                status: "completed",
+                completed_at: new Date().toISOString()
+            }
+        }
+    })
+});
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Delete Record (--delete)</h3>
+        <p>Removes records from the specified collection.</p>
+
+        <div class="example">
+            <h4>Example 1: Delete User</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "users",
+        command: "--delete",
+        data: { email: "john@example.com" }
+    })
+});
+            </code></pre>
+        </div>
+
+        <div class="example">
+            <h4>Example 2: Delete Completed Projects</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "projects",
+        command: "--delete",
+        data: { status: "completed" }
+    })
+});
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3>Verify Record (--verify)</h3>
+        <p>Checks if a record exists and returns it if found.</p>
+
+        <div class="example">
+            <h4>Example 1: Verify User Credentials</h4>
+            <pre><code>
+fetch('http://localhost:3010/api/vornifydb', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        database_name: "VornifyDB",
+        collection_name: "users",
+        command: "--verify",
+        data: {
+            email: "john@example.com",
+            password: "hashedPassword123"
+        }
+    })
+});
+            </code></pre>
+        </div>
+    </div>
+
+    <h2>Response Formats</h2>
+    <div class="example">
+        <h4>Success Response</h4>
+        <pre><code>
+{
+    "status": true,
+    "data": {
+        // Operation result data
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h4>Error Response</h4>
+        <pre><code>
+{
+    "status": false,
+    "error": "Error message description"
+}
+        </code></pre>
+    </div>
+
+    <h2>Best Practices</h2>
+    <ul>
+        <li>Always include error handling in your requests</li>
+        <li>Use custom IDs with meaningful prefixes (user_, proj_, etc.)</li>
+        <li>Include timestamps (created_at, updated_at) for all records</li>
+        <li>Set appropriate isPrivate flags for data security</li>
+        <li>Use specific queries to minimize data transfer</li>
+    </ul>
+
+    <h2>Error Handling Example</h2>
+    <div class="example">
+        <pre><code>
+async function safeDBOperation(requestData) {
+    try {
+        const response = await fetch('http://localhost:3010/api/vornifydb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        });
+
+        const result = await response.json();
+        
+        if (!result.status) {
+            console.error('Operation failed:', result.error);
+            return null;
+        }
+        
+        return result.data;
+    } catch (error) {
+        console.error('Network or server error:', error);
+        return null;
+    }
+}
+        </code></pre>
+    </div>
+
+</body>
+</html> 
